@@ -13,6 +13,8 @@ import serial
 import random
 from time import sleep
 from collections import deque
+from openpyxl import Workbook
+from datetime import datetime
 
 
 if sys.platform == "linux" or sys.platform == "linux2":
@@ -135,75 +137,87 @@ class Ui(QMainWindow):
     # ==============================================================
     def read_serial_task(self, readport, writeport):
         
-        x_ = 0
-        while True:
-            self.data.append({"x":x_, "y":random.randint(1,5)})
-            x = [item['x'] for item in self.data]
-            y = [item['y'] for item in self.data]
-            self.curve.setData(x,y)
-            sleep(0.1)
-            x_ += 1
+        workbook = Workbook()
+        sheet = workbook.active
 
-        # try:
-        #     ser = serial.Serial(readport, 9600)
-        #     ser_write = serial.Serial(writeport, 9600)
+        x_ = 1
+        # while True:
+            
+        #     sleep(0.1)
+        #     x_ += 1
 
-        #     channels_to_read = []
+        try:
+            ser = serial.Serial(readport, 9600)
+            ser_write = serial.Serial(writeport, 9600)
 
-        #     for key, value in self.chbx_grp.items():
-        #         if value.isChecked():
-        #             channels_to_read.append(key)
+            channels_to_read = []
 
-        #     print("channels_to_read: ", channels_to_read)
+            for key, value in self.chbx_grp.items():
+                if value.isChecked():
+                    channels_to_read.append(key)
 
-        # except:
-        #     print("Invalid port")
-        #     msg = QMessageBox()
-        #     msg.setWindowTitle("Error")
-        #     msg.setText("No Device Found!")
-        #     msg.setIcon(QMessageBox.Critical)
-        #     msg.exec_()
-        #     self.btn_start.setEnabled(True)
-        #     self.btn_stop.setEnabled(False)
-        #     self.btn_clear.setEnabled(True)
-        #     return None
+            print("channels_to_read: ", channels_to_read)
 
-        # print("Listening on COM PORT: ",readport)
-        # channel_number = 1
+        except:
+            print("Invalid port")
+            msg = QMessageBox()
+            msg.setWindowTitle("Error")
+            msg.setText("No Device Found!")
+            msg.setIcon(QMessageBox.Critical)
+            msg.exec_()
+            self.btn_start.setEnabled(True)
+            self.btn_stop.setEnabled(False)
+            self.btn_clear.setEnabled(True)
+            return None
 
-        # while self.read_serial_flag:
-        #     for channel_number in self.chbx_grp.keys():
+        print("Listening on COM PORT: ",readport)
+        channel_number = 1
+
+        while self.read_serial_flag:
+            for channel_number in self.chbx_grp.keys():
                 
-        #         if not self.read_serial_flag:
-        #             break
+                if not self.read_serial_flag:
+                    break
 
-        #         if channel_number in channels_to_read:
-        #             try:
-        #                 cmd = 'READ{}?\r\n'.format(channel_number)
-        #                 print("\n",cmd.strip())
+                if channel_number in channels_to_read:
+                    try:
+                        cmd = 'READ{}?\r\n'.format(channel_number)
+                        print("\n",cmd.strip())
                         
-        #                 ser.write(cmd.encode())
-        #                 ser.flush()
-        #                 line = ser.read_until(b'\r').decode().strip()
+                        ser.write(cmd.encode())
+                        ser.flush()
+                        line = ser.read_until(b'\r').decode().strip()
 
-        #                 if self.read_serial_flag:
-        #                     print("Channel number ",channel_number," : ",line)
+                        if self.read_serial_flag:
+                            print("Channel number ",channel_number," : ",line)
 
-        #                     if "not enabled" in line:
-        #                         self.val_lbls[channel_number].setText("Not Enabled!") 
+                            if "not enabled" in line:
+                                self.val_lbls[channel_number].setText("Not Enabled!") 
                             
-        #                     else:
-        #                         val = round(float(line.split(",")[0]),4)
-        #                         val = str(val)+"\n"
+                            else:
+                                val = round(float(line.split(",")[0]),4)
+
+                                val_x, val_y = x_, val
+                                self.data.append({"x" : val_x, "y" : val_y})
+                                x = [item['x'] for item in self.data]
+                                y = [item['y'] for item in self.data]
+                                self.curve.setData(x,y)
+                                sheet['A'+str(x_)].value = val_x
+                                sheet['B'+str(x_)].value = val_y
+
+                                workbook.save(filename="{}.xlsx".format(datetime.now().strftime("%Y-%m-%d_%H:%M:%S")))
+
+                                val = str(val)+"\n"
                                 
-        #                         if channel_number == 3:
-        #                             print("sending: ",val) 
-        #                             ser_write.write(val.encode())
+                                if channel_number == 3:
+                                    print("sending: ",val) 
+                                    ser_write.write(val.encode())
                                 
-        #                         self.val_lbls[channel_number].setText(line)            
+                                self.val_lbls[channel_number].setText(line)            
                     
-        #             except Exception as e:
-        #                 print("exception: ", e)
+                    except Exception as e:
+                        print("exception: ", e)
+                    x_ += 1
             
 
     # For this task other functions are not required
