@@ -141,10 +141,19 @@ class Ui(QMainWindow):
         sheet = workbook.active
 
         x_ = 1
+
         # while True:
-            
-        #     sleep(0.1)
-        #     x_ += 1
+        #     val_x, val_y = x_, random.randint(1,10)
+        #     self.data.append({"x" : val_x, "y" : val_y})
+        #     x = [item['x'] for item in self.data]
+        #     y = [item['y'] for item in self.data]
+        #     self.curve.setData(x,y)
+        #     sheet['A'+str(x_)].value = val_x
+        #     sheet['B'+str(x_)].value = val_y
+
+            # workbook.save(filename="{}.xlsx".format("data.xlsx"))
+            # sleep(0.1)
+            # x_ += 1
 
         try:
             ser = serial.Serial(readport, 9600)
@@ -205,7 +214,7 @@ class Ui(QMainWindow):
                                 sheet['A'+str(x_)].value = val_x
                                 sheet['B'+str(x_)].value = val_y
 
-                                workbook.save(filename="{}.xlsx".format(datetime.now().strftime("%Y-%m-%d_%H:%M:%S")))
+                                workbook.save(filename="{}.xlsx".format("data.xlsx"))
 
                                 val = str(val)+"\n"
                                 
