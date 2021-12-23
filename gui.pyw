@@ -90,6 +90,8 @@ class Ui(QMainWindow):
         self.win = pg.GraphicsWindow()
         self.plot = self.win.addPlot(title='', labels={'bottom': 'time','left': "temperature"})
         self.curve = self.plot.plot()
+        # self.plot.setYRange(18, 24, padding=0)
+        # self.plot.setXRange(20, 20, padding=0)
         self.data = deque(maxlen=20)
         
         self.show()
@@ -205,22 +207,26 @@ class Ui(QMainWindow):
                             
                             else:
                                 val = round(float(line.split(",")[0]),4)
-
-                                val_x, val_y = x_, val
-                                self.data.append({"x" : val_x, "y" : val_y})
-                                x = [item['x'] for item in self.data]
-                                y = [item['y'] for item in self.data]
-                                self.curve.setData(x,y)
-                                sheet['A'+str(x_)].value = val_x
-                                sheet['B'+str(x_)].value = val_y
-
-                                workbook.save(filename="{}.xlsx".format("data.xlsx"))
-
+                                numb_val =  val
                                 val = str(val)+"\n"
                                 
-                                if channel_number == 3:
+                                # ====================================================================
+                                #   channel_number to value which you want to plot
+                                # ====================================================================
+                                if channel_number == 10:
+                                        
+                                    val_x, val_y = x_, numb_val
+                                    self.data.append({"x" : val_x, "y" : val_y})
+                                    x = [item['x'] for item in self.data]
+                                    y = [item['y'] for item in self.data]
+                                    self.curve.setData(x,y)
+                                    sheet['A'+str(x_)].value = val_x
+                                    sheet['B'+str(x_)].value = val_y
+
+                                    workbook.save(filename="{}.xlsx".format("data"))
                                     print("sending: ",val) 
                                     ser_write.write(val.encode())
+                                # ====================================================================
                                 
                                 self.val_lbls[channel_number].setText(line)            
                     
