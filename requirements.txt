@@ -1,3 +1,7 @@
 pyserial
 matplotlib
 numpy
+PyQt5
+qt_material
+pyqtgraph
+openpyxls
