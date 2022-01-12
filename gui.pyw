@@ -1,19 +1,19 @@
-from os import write
-from PyQt5 import uic
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
-from PyQt5.uic.uiparser import QtCore
+from PySide2 import QtGui
+from PySide2 import QtCore
+from PySide2.QtWidgets import *
+from PySide2.QtCore import *
+from PySide2.QtGui import *
+
+from qtpy import uic
 import pyqtgraph as pg
+from qt_material import apply_stylesheet
+
+import serial
+from openpyxl import Workbook
 
 import sys
-from qt_material import apply_stylesheet
-import traceback, sys
-import serial
-import random
 from time import sleep
 from collections import deque
-from openpyxl import Workbook
 from datetime import datetime
 
 
@@ -28,53 +28,95 @@ elif sys.platform == "win32":
 elif sys.platform == "darwin":
     pass
 
-class WorkerSignals(QObject):
-    error = pyqtSignal(tuple)
-    progress = pyqtSignal(int)
-    result = pyqtSignal(object)
-    finished = pyqtSignal()
-    
-class Worker(QRunnable):
+class serialThread(QThread):
+    progress_output_signal     = QtCore.Signal(list)
+    graph_datapoint_signal     = QtCore.Signal(list)
+    rw_channels_signal         = QtCore.Signal(bool)
+    finished_signal            = QtCore.Signal(bool)
 
-    def __init__(self, fn, signals_flag, *args, **kwargs):
-        # signals_flag = [progress, result, finished]
+    def __init__(self):
+        QThread.__init__(self)
 
-        super(Worker, self).__init__()
-        self.fn = fn
-        self.args = args
-        self.kwargs = kwargs    
-        self.signals = WorkerSignals()
-        self.signals_flag = signals_flag
+        self.read_channels  = None
+        self.write_channels = None
+        self.ser_read       = None
+        self.ser_write      = None
+        self.serial_flag    = False
 
-        if self.signals_flag[0]:
-            kwargs['progress_callback'] = self.signals.progress
+    def __del__(self):
+        print("Thread terminating...")
 
-    @pyqtSlot()
-    def run(self):
+    def kill(self):
         try:
-            result = self.fn(*self.args, **self.kwargs)
+            self.ser_read.close()
+            self.ser_write.close()
+        except serial.serialutil.PortNotOpenError:
+            print("Already Closed!")
+        self.serial_flag  = False
+
+    def initiate(self, readport, writeport):
+        try:
+            self.ser_read  = serial.Serial(readport, 9600)
+            self.ser_write = serial.Serial(writeport, 9600)
+
         except:
-            traceback.print_exc()
-            exctype, value = sys.exc_info()[:2]
-            self.signals.error.emit((exctype, value, traceback.format_exc()))
-        else:
-            if self.signals_flag[1]:
-                self.signals.result.emit(result) # Return the result of the processing
-        finally:
-            if self.signals_flag[2]:
-                self.signals.finished.emit() # Done
+            print("Invalid port!")
+            msg = QMessageBox()
+            msg.setWindowTitle("Error")
+            msg.setText("No Device Found!")
+            msg.setIcon(QMessageBox.Critical)
+            msg.exec_()
+            self.finished.emit(True)
+            return None
 
-# class serialThread(QThread):
-#     progress_output = QtCore.Signal(int)
+        self.serial_flag = True
 
-#     def __init__(self):
-#         QThread.__init__(self)
+        # don't call run() directly, instead call start()
+        # start() will autonatically run()
+        self.start()
 
-#     def __del__(self):
-#         print("Thread terminating...")
+    def run(self):
 
-#     def run(self):
-#         pass
+        x_ = 1
+
+        while self.serial_flag:
+            self.rw_channels_signal.emit(True)
+            if not self.read_channels:
+                continue
+
+            print("write :",self.write_channels)
+            print("read  :",self.read_channels)
+
+            
+            for channel_number in self.read_channels:
+                try:
+                    cmd = 'READ{}?\r\n'.format(channel_number)
+                    self.ser_read.write(cmd.encode())
+                    self.ser_read.flush()
+
+                    output = self.ser_read.read_until(b'\r').decode().strip()
+                    print("output: ",output)
+                    
+                    if "not enabled" in output:
+                        self.progress_output_signal.emit([channel_number, "Not Enabled!"])
+
+                    else:
+                        self.progress_output_signal.emit([channel_number, output])
+                        
+                        val = round(float(output.split(",")[0]),4)
+                        numb_val =  val
+                        val = str(val)+"\n"
+                        print("numb_val: ",numb_val)
+                        
+                        self.graph_datapoint_signal.emit([ x_ , numb_val])
+
+                        if channel_number in self.write_channels:
+                            self.ser_write.write(val.encode())
+                            self.ser_write.flush()
+
+                except Exception as e:
+                            print(e)
+                x_ += 1
 
 class Ui(QMainWindow):
     
@@ -84,184 +126,146 @@ class Ui(QMainWindow):
         uic.loadUi('main_ui.ui', self)
         self.setWindowTitle("MickroK Temperature Reader")
 
-        self.threadpool = QThreadPool()
-        print("Multithreading with maximum %d threads" % self.threadpool.maxThreadCount())
-        
+        # ==========================================================
+        #                       Graphing Window 
+        # ==========================================================
         self.win = pg.GraphicsWindow()
         self.plot = self.win.addPlot(title='', labels={'bottom': 'time','left': "temperature"})
         self.curve = self.plot.plot()
-        # self.plot.setYRange(18, 24, padding=0)
-        # self.plot.setXRange(20, 20, padding=0)
         self.data = deque(maxlen=20)
-        
-        self.show()
+        # ==========================================================
 
-        self.read_serial_flag = True
 
+        # ==========================================================
+        #                       Global Vars
+        # ==========================================================
         self.val_lbls = {
-            1   :   self.lbl_com1_val,
-            2   :   self.lbl_com2_val,
-            3   :   self.lbl_com3_val,
-            10  :   self.lbl_com4_val,
-            11  :   self.lbl_com5_val,
-            12  :   self.lbl_com6_val,
-            13  :   self.lbl_com7_val,
-            14  :   self.lbl_com8_val,
-            15  :   self.lbl_com9_val,
-            16  :   self.lbl_com10_val
+            1   :   self.lbl_ch1_val,
+            2   :   self.lbl_ch2_val,
+            3   :   self.lbl_ch3_val,
+            10  :   self.lbl_ch4_val,
+            11  :   self.lbl_ch5_val,
+            12  :   self.lbl_ch6_val,
+            13  :   self.lbl_ch7_val,
+            14  :   self.lbl_ch8_val,
+            15  :   self.lbl_ch9_val,
+            16  :   self.lbl_ch10_val
         }
         
-        self.chbx_grp = {
-            1   :   self.chbx_com1,
-            2   :   self.chbx_com2,
-            3   :   self.chbx_com3,
-            10  :   self.chbx_com4,
-            11  :   self.chbx_com5,
-            12  :   self.chbx_com6,
-            13  :   self.chbx_com7,
-            14  :   self.chbx_com8,
-            15  :   self.chbx_com9,
-            16  :   self.chbx_com10,
+        self.read_chbx_grp = {
+            1   :   self.chbx_read1,
+            2   :   self.chbx_read2,
+            3   :   self.chbx_read3,
+            10  :   self.chbx_read4,
+            11  :   self.chbx_read5,
+            12  :   self.chbx_read6,
+            13  :   self.chbx_read7,
+            14  :   self.chbx_read8,
+            15  :   self.chbx_read9,
+            16  :   self.chbx_read10,
         }
+
+        self.write_chbx_grp = {
+            1   :   self.chbx_write1,
+            2   :   self.chbx_write2,
+            3   :   self.chbx_write3,
+            10  :   self.chbx_write4,
+            11  :   self.chbx_write5,
+            12  :   self.chbx_write6,
+            13  :   self.chbx_write7,
+            14  :   self.chbx_write8,
+            15  :   self.chbx_write9,
+            16  :   self.chbx_write10,
+        }
+
+        # ==========================================================
+        #                 Thread Signals & Slots
+        # ==========================================================
+        self.serial_thread = serialThread()
+        self.serial_thread.finished_signal.connect(self.stop)
+        self.serial_thread.rw_channels_signal.connect(self.get_rw_channels)
+        self.serial_thread.progress_output_signal.connect(self.update_channel_val)
+        self.serial_thread.graph_datapoint_signal.connect(self.update_graph)
+        
+        # ==========================================================
 
         self.btn_stop.setEnabled(False)
-        self.chbx_com3.setChecked(True)
 
+
+        # ==========================================================
+        #                        GUI Slots
+        # ==========================================================
         self.btn_start.pressed.connect(self.start)
         self.btn_stop.pressed.connect(self.stop)
         self.btn_clear.pressed.connect(self.clear)
+        # ==========================================================
+
+        self.show()
 
     def closeEvent(self,event):
-        self.read_serial_flag = False
-    
-    # ==============================================================
-    #    Thread functions
-    # ==============================================================
-    def read_serial_task(self, readport, writeport):
-        
-        workbook = Workbook()
-        sheet = workbook.active
+        self.serial_thread.kill()
+        while self.serial_thread.isRunning():
+            sleep(0.1)
 
-        x_ = 1
+        self.win.close()
 
-        # while True:
-        #     val_x, val_y = x_, random.randint(1,10)
-        #     self.data.append({"x" : val_x, "y" : val_y})
-        #     x = [item['x'] for item in self.data]
-        #     y = [item['y'] for item in self.data]
-        #     self.curve.setData(x,y)
-        #     sheet['A'+str(x_)].value = val_x
-        #     sheet['B'+str(x_)].value = val_y
+    def get_rw_channels(self):
 
-            # workbook.save(filename="{}.xlsx".format("data.xlsx"))
-            # sleep(0.1)
-            # x_ += 1
+        channels_to_read = []
+        channels_to_write = []
 
-        try:
-            ser = serial.Serial(readport, 9600)
-            ser_write = serial.Serial(writeport, 9600)
-
-            channels_to_read = []
-
-            for key, value in self.chbx_grp.items():
+        for key, value in self.read_chbx_grp.items():
                 if value.isChecked():
                     channels_to_read.append(key)
 
-            print("channels_to_read: ", channels_to_read)
 
-        except:
-            print("Invalid port")
-            msg = QMessageBox()
-            msg.setWindowTitle("Error")
-            msg.setText("No Device Found!")
-            msg.setIcon(QMessageBox.Critical)
-            msg.exec_()
-            self.btn_start.setEnabled(True)
-            self.btn_stop.setEnabled(False)
-            self.btn_clear.setEnabled(True)
-            return None
+        for key, value in self.write_chbx_grp.items():
+                if value.isChecked():
+                    channels_to_write.append(key)
 
-        print("Listening on COM PORT: ",readport)
-        channel_number = 1
+        self.serial_thread.read_channels  = channels_to_read
+        self.serial_thread.write_channels = channels_to_write
 
-        while self.read_serial_flag:
-            for channel_number in self.chbx_grp.keys():
-                
-                if not self.read_serial_flag:
-                    break
+    def update_channel_val(self, data_list):
+        self.val_lbls[data_list[0]].setText(data_list[1])
 
-                if channel_number in channels_to_read:
-                    try:
-                        cmd = 'READ{}?\r\n'.format(channel_number)
-                        print("\n",cmd.strip())
-                        
-                        ser.write(cmd.encode())
-                        ser.flush()
-                        line = ser.read_until(b'\r').decode().strip()
 
-                        if self.read_serial_flag:
-                            print("Channel number ",channel_number," : ",line)
+    def update_graph(self, data_point):
+        print("update_graph(): ", data_point)
+        val_x, val_y = data_point
+        self.data.append({"x" : val_x, "y" : val_y})
+        x = [item['x'] for item in self.data]
+        y = [item['y'] for item in self.data]
+        self.curve.setData(x,y)
+        self.sheet['A'+str(data_point[0])].value = val_x
+        self.sheet['B'+str(data_point[0])].value = val_y
 
-                            if "not enabled" in line:
-                                self.val_lbls[channel_number].setText("Not Enabled!") 
-                            
-                            else:
-                                val = round(float(line.split(",")[0]),4)
-                                numb_val =  val
-                                val = str(val)+"\n"
-                                
-                                # ====================================================================
-                                #   channel_number to value which you want to plot
-                                # ====================================================================
-                                if channel_number == 10:
-                                        
-                                    val_x, val_y = x_, numb_val
-                                    self.data.append({"x" : val_x, "y" : val_y})
-                                    x = [item['x'] for item in self.data]
-                                    y = [item['y'] for item in self.data]
-                                    self.curve.setData(x,y)
-                                    sheet['A'+str(x_)].value = val_x
-                                    sheet['B'+str(x_)].value = val_y
-
-                                    workbook.save(filename="{}.xlsx".format("data"))
-                                    print("sending: ",val) 
-                                    ser_write.write(val.encode())
-                                # ====================================================================
-                                
-                                self.val_lbls[channel_number].setText(line)            
-                    
-                    except Exception as e:
-                        print("exception: ", e)
-                    x_ += 1
-            
-
-    # For this task other functions are not required
-    # ==============================================================
-    
     def start(self):
-        self.read_serial_flag = True
+        self.data.clear()
+        self.curve.clear()
         self.btn_start.setEnabled(False)
         self.btn_stop.setEnabled(True)
         self.btn_clear.setEnabled(False)
         read_port = self.cmb_readport.currentText()
         write_port = self.cmb_writeport.currentText()
 
-        # Starting Threads
-        worker = Worker(self.read_serial_task,[False,False,False],read_port, write_port)
-        print("starting thread")
-        self.threadpool.start(worker)
+        self.workbook = Workbook()
+        self.sheet = self.workbook.active
+
+        self.serial_thread.initiate(read_port, write_port)
 
     
     def stop(self):
+        filename = datetime.now().strftime("%Y-%m-%d-%f")
+        self.workbook.save(filename="{}.xlsx".format(filename))
         self.btn_start.setEnabled(True)
         self.btn_stop.setEnabled(False)
         self.btn_clear.setEnabled(True)
-        self.read_serial_flag = False
-        print("terminating thread")
+        self.serial_thread.kill()
     
     def clear(self):
-        for lbl in self.val_lbls:
-            lbl.setText("-")
+        for ch_num in self.val_lbls:
+            self.val_lbls[ch_num].setText("-")
 
 app = QApplication(sys.argv)
 app.setWindowIcon(QIcon("resources/icons/prl.png"))
