@@ -1,7 +1,6 @@
-pyserial
-matplotlib
-numpy
-PyQt5
-qt_material
-pyqtgraph
-openpyxls
+PySide2==5.15.2
+QtPy==2.0.0
+pyqtgraph==0.12.3
+qt_material==2.8.13
+pyserial==3.5
+openpyxl==3.0.9
