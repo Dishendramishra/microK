@@ -108,10 +108,11 @@ class serialThread(QThread):
                         val = str(val)+"\n"
                         print("numb_val: ",numb_val)
                         
-                        self.graph_datapoint_signal.emit([ x_ , numb_val])
-
+                        # Plotting only write channels
                         if channel_number in self.write_channels:
+                            self.graph_datapoint_signal.emit([ x_ , numb_val])
                             self.ser_write.write(val.encode())
+                            self.ser_write.write(b"\n")
                             self.ser_write.flush()
 
                 except Exception as e:

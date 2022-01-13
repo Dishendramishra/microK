@@ -93,7 +93,7 @@
           </property>
           <item>
            <property name="text">
-            <string>COM11</string>
+            <string>COM9</string>
            </property>
           </item>
           <item>
@@ -128,7 +128,7 @@
           </item>
           <item>
            <property name="text">
-            <string>COM9</string>
+            <string>COM11</string>
            </property>
           </item>
           <item>
@@ -177,7 +177,7 @@
          <widget class="QComboBox" name="cmb_writeport">
           <item>
            <property name="text">
-            <string>COM5</string>
+            <string>COM8</string>
            </property>
           </item>
           <item>
@@ -192,17 +192,17 @@
           </item>
           <item>
            <property name="text">
+            <string>COM5</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
             <string>COM6</string>
            </property>
           </item>
           <item>
            <property name="text">
             <string>COM7</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>COM8</string>
            </property>
           </item>
           <item>
