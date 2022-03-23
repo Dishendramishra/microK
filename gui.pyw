@@ -31,6 +31,7 @@ elif sys.platform == "darwin":
 class serialThread(QThread):
     progress_output_signal     = QtCore.Signal(list)
     graph_datapoint_signal     = QtCore.Signal(list)
+    log_dataobject_signal      = QtCore.Signal(list)
     rw_channels_signal         = QtCore.Signal(bool)
     finished_signal            = QtCore.Signal(bool)
 
@@ -39,6 +40,7 @@ class serialThread(QThread):
 
         self.read_channels  = None
         self.write_channels = None
+        self.log_channels   = None
         self.ser_read       = None
         self.ser_write      = None
         self.serial_flag    = False
@@ -83,11 +85,11 @@ class serialThread(QThread):
             self.rw_channels_signal.emit(True)
             if not self.read_channels:
                 continue
-
-            print("write :",self.write_channels)
-            print("read  :",self.read_channels)
-
             
+            print("\nread  :",self.read_channels)
+            print("write :",self.write_channels)
+            print("log  :",self.log_channels,"\n")
+
             for channel_number in self.read_channels:
                 try:
                     cmd = 'READ{}?\r\n'.format(channel_number)
@@ -95,7 +97,6 @@ class serialThread(QThread):
                     self.ser_read.flush()
 
                     output = self.ser_read.read_until(b'\r').decode().strip()
-                    print("output: ",output)
                     
                     if "not enabled" in output:
                         self.progress_output_signal.emit([channel_number, "Not Enabled!"])
@@ -106,15 +107,18 @@ class serialThread(QThread):
                         val = round(float(output.split(",")[0]),4)
                         numb_val =  val
                         val = str(val)+"\n"
-                        print("numb_val: ",numb_val)
+                        print(f"CH-{channel_number} numb_val: {numb_val}")
                         
+                        if channel_number in self.log_channels:
+                            self.log_dataobject_signal.emit([channel_number, x_, numb_val])
+
                         # Plotting only write channels
                         if channel_number in self.write_channels:
                             self.graph_datapoint_signal.emit([ x_ , numb_val])
                             self.ser_write.write(val.encode())
                             self.ser_write.write(b"\n")
                             self.ser_write.flush()
-                            x_ += 1
+                            x_ += 1                
 
                 except Exception as e:
                             print(e)
@@ -179,10 +183,30 @@ class Ui(QMainWindow):
             16  :   self.chbx_write10,
         }
 
+        self.log_chbx_grp = {
+            1   :   self.chbx_log1,
+            2   :   self.chbx_log2,
+            3   :   self.chbx_log3,
+            10  :   self.chbx_log4,
+            11  :   self.chbx_log5,
+            12  :   self.chbx_log6,
+            13  :   self.chbx_log7,
+            14  :   self.chbx_log8,
+            15  :   self.chbx_log9,
+            16  :   self.chbx_log10,
+        }
+
         # This variable is used to keep track of date while 
         # saving data in update_graph()
         self.workbook_create_date = None
 
+        self.channels_to_read   = None 
+        self.channels_to_write  = None 
+        self.channels_to_log    = None
+
+        self.channel_indices = None
+
+        self.col_in_sheet = 1
         # ==========================================================
         #                 Thread Signals & Slots
         # ==========================================================
@@ -191,6 +215,7 @@ class Ui(QMainWindow):
         self.serial_thread.rw_channels_signal.connect(self.get_rw_channels)
         self.serial_thread.progress_output_signal.connect(self.update_channel_val)
         self.serial_thread.graph_datapoint_signal.connect(self.update_graph)
+        self.serial_thread.log_dataobject_signal.connect(self.update_workbook)
         
         # ==========================================================
 
@@ -215,21 +240,27 @@ class Ui(QMainWindow):
         self.win.close()
 
     def get_rw_channels(self):
-
-        channels_to_read = []
-        channels_to_write = []
+        self.channels_to_read = []
+        self.channels_to_write = []
+        self.channels_to_log = []
 
         for key, value in self.read_chbx_grp.items():
                 if value.isChecked():
-                    channels_to_read.append(key)
-
+                    self.channels_to_read.append(key)
 
         for key, value in self.write_chbx_grp.items():
                 if value.isChecked():
-                    channels_to_write.append(key)
+                    self.channels_to_write.append(key)
 
-        self.serial_thread.read_channels  = channels_to_read
-        self.serial_thread.write_channels = channels_to_write
+        for key, value in self.log_chbx_grp.items():
+            if value.isChecked():
+                self.channels_to_log.append(key)
+
+        self.serial_thread.read_channels  = self.channels_to_read
+        self.serial_thread.write_channels = self.channels_to_write
+        self.serial_thread.log_channels   = self.channels_to_log
+
+        self.configure_workbook()
 
     def update_channel_val(self, data_list):
         self.val_lbls[data_list[0]].setText(data_list[1])
@@ -242,24 +273,69 @@ class Ui(QMainWindow):
         x = [item['x'] for item in self.data]
         y = [item['y'] for item in self.data]
         self.curve.setData(x,y)
-        # self.sheet['A'+str(data_point[0])].value = val_x
 
-        if datetime.now().strftime("%d") > self.workbook_create_date.strftime("%d"):
-            self.save_workbook()
-            self.create_workbook()
 
-        self.sheet['A'+str(data_point[0]+1)].value = datetime.now().strftime("%Y-%m-%d:%H:%M:%S")
-        self.sheet['B'+str(data_point[0]+1)].value = val_y
-
+    # ==========================================================
+    #                 Excel Workbook Functions
+    # ==========================================================    
     def create_workbook(self):
         self.workbook = Workbook()
         self.workbook_create_date = datetime.now()
         self.sheet = self.workbook.active
+        self.col_in_sheet = 1
+
+    def configure_workbook(self):
+
+        current_row = 2
+
+        if not self.channel_indices:
+            self.channel_indices = {}
+
+        for channel in self.channels_to_log:
+
+            # before adding a channel in excel file we need to find 
+            # the starting row number for newly added column, to
+            # start saving data
+            if channel in self.channel_indices:
+                current_row = self.channel_indices[channel][2]
+
+            if channel not in self.channel_indices:
+                #                               [ timestamp col, value col, row]
+                self.sheet.cell(row=1, column=self.col_in_sheet).value = f'CH-{channel} Timestamp'
+                self.sheet.cell(row=1, column=self.col_in_sheet+1).value =f'CH-{channel}'
+
+                self.channel_indices[channel] = [self.col_in_sheet, self.col_in_sheet+1, current_row]
+                
+                self.col_in_sheet  += 2
+
+    def update_workbook(self, data_obj):
+        # Checking if new day starting, if new day start then 
+        # creating and configuring a new excel file.
+        if datetime.now().strftime("%d") > self.workbook_create_date.strftime("%d"):
+            self.save_workbook()
+            self.create_workbook()
+
+        channel, val_x, val_y = data_obj
+        timestamp = self.channel_indices[channel][0]
+        value     = self.channel_indices[channel][1]
+        row       = self.channel_indices[channel][2]
+
+        ts = datetime.now().strftime("%Y-%m-%d:%H:%M:%S")
+        print(f'CH-{channel} : {ts}')
+
+        self.sheet.cell(row=row, column=timestamp).value = ts
+        self.sheet.cell(row=row, column=value).value     = val_y
+
+        # increading row value for writing next time
+        self.channel_indices[channel][2] += 1
 
     def save_workbook(self):
         filename = self.workbook_create_date.strftime("%Y-%m-%d-%f")
         self.workbook.save(filename="{}.xlsx".format(filename))
         self.workbook.close()
+
+    # ==========================================================
+
 
     # ==========================================================
     #                        GUI Events
