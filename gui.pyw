@@ -14,7 +14,7 @@ from openpyxl import Workbook
 import sys
 from time import sleep
 from collections import deque
-from datetime import datetime
+from datetime import date, datetime
 
 
 if sys.platform == "linux" or sys.platform == "linux2":
@@ -179,6 +179,10 @@ class Ui(QMainWindow):
             16  :   self.chbx_write10,
         }
 
+        # This variable is used to keep track of date while 
+        # saving data in update_graph()
+        self.workbook_create_date = None
+
         # ==========================================================
         #                 Thread Signals & Slots
         # ==========================================================
@@ -239,9 +243,27 @@ class Ui(QMainWindow):
         y = [item['y'] for item in self.data]
         self.curve.setData(x,y)
         # self.sheet['A'+str(data_point[0])].value = val_x
-        self.sheet['A'+str(data_point[0])].value = datetime.now().strftime("%Y-%m-%d:%H:%M:%S")
-        self.sheet['B'+str(data_point[0])].value = val_y
 
+        if datetime.now().strftime("%d") > self.workbook_create_date.strftime("%d"):
+            self.save_workbook()
+            self.create_workbook()
+
+        self.sheet['A'+str(data_point[0]+1)].value = datetime.now().strftime("%Y-%m-%d:%H:%M:%S")
+        self.sheet['B'+str(data_point[0]+1)].value = val_y
+
+    def create_workbook(self):
+        self.workbook = Workbook()
+        self.workbook_create_date = datetime.now()
+        self.sheet = self.workbook.active
+
+    def save_workbook(self):
+        filename = self.workbook_create_date.strftime("%Y-%m-%d-%f")
+        self.workbook.save(filename="{}.xlsx".format(filename))
+        self.workbook.close()
+
+    # ==========================================================
+    #                        GUI Events
+    # ==========================================================    
     def start(self):
         self.data.clear()
         self.curve.clear()
@@ -251,15 +273,12 @@ class Ui(QMainWindow):
         read_port = self.cmb_readport.currentText()
         write_port = self.cmb_writeport.currentText()
 
-        self.workbook = Workbook()
-        self.sheet = self.workbook.active
-
+        self.create_workbook()
         self.serial_thread.initiate(read_port, write_port)
 
     
     def stop(self):
-        filename = datetime.now().strftime("%Y-%m-%d-%f")
-        self.workbook.save(filename="{}.xlsx".format(filename))
+        self.save_workbook()
         self.btn_start.setEnabled(True)
         self.btn_stop.setEnabled(False)
         self.btn_clear.setEnabled(True)
@@ -268,6 +287,7 @@ class Ui(QMainWindow):
     def clear(self):
         for ch_num in self.val_lbls:
             self.val_lbls[ch_num].setText("-")
+    # ==========================================================
 
 app = QApplication(sys.argv)
 app.setWindowIcon(QIcon("resources/icons/prl.png"))
