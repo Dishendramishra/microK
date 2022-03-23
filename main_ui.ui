@@ -93,7 +93,7 @@
           </property>
           <item>
            <property name="text">
-            <string>COM9</string>
+            <string>COM11</string>
            </property>
           </item>
           <item>
@@ -128,7 +128,7 @@
           </item>
           <item>
            <property name="text">
-            <string>COM11</string>
+            <string>COM9</string>
            </property>
           </item>
           <item>
@@ -408,7 +408,7 @@
            <enum>Qt::LeftToRight</enum>
           </property>
           <property name="text">
-           <string>CH 11</string>
+           <string>Echelle</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -437,7 +437,7 @@
            <enum>Qt::LeftToRight</enum>
           </property>
           <property name="text">
-           <string>CH 14</string>
+           <string>PARAS-2 Pier</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -475,7 +475,7 @@
            <enum>Qt::LeftToRight</enum>
           </property>
           <property name="text">
-           <string>CH 10</string>
+           <string>Grism</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -494,7 +494,7 @@
            <enum>Qt::LeftToRight</enum>
           </property>
           <property name="text">
-           <string>CH 3</string>
+           <string>Lens Barrel</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -513,7 +513,7 @@
            <enum>Qt::LeftToRight</enum>
           </property>
           <property name="text">
-           <string>CH 12</string>
+           <string>Mirror- M1</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -626,7 +626,7 @@
            <enum>Qt::LeftToRight</enum>
           </property>
           <property name="text">
-           <string>CH 13</string>
+           <string>Mirror- M2</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>

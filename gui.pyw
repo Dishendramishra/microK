@@ -144,6 +144,20 @@ class Ui(QMainWindow):
         # ==========================================================
         #                       Global Vars
         # ==========================================================
+        
+        self.channel_names = {
+            1   :   "none",
+            2   :   "none",
+            3   :   "Lens Barrel",
+            10  :   "Grism",
+            11  :   "Echelle",
+            12  :   "Mirror-M1",
+            13  :   "Mirror-M2",
+            14  :   "PARAS-2 Pier",
+            15  :   "none",
+            16  :   "none"
+        }
+        
         self.val_lbls = {
             1   :   self.lbl_ch1_val,
             2   :   self.lbl_ch2_val,
@@ -301,8 +315,8 @@ class Ui(QMainWindow):
 
             if channel not in self.channel_indices:
                 #                               [ timestamp col, value col, row]
-                self.sheet.cell(row=1, column=self.col_in_sheet).value = f'CH-{channel} Timestamp'
-                self.sheet.cell(row=1, column=self.col_in_sheet+1).value =f'CH-{channel}'
+                self.sheet.cell(row=1, column=self.col_in_sheet).value = f'{self.channel_names[channel]} Timestamp'
+                self.sheet.cell(row=1, column=self.col_in_sheet+1).value =f'{self.channel_names[channel]}'
 
                 self.channel_indices[channel] = [self.col_in_sheet, self.col_in_sheet+1, current_row]
                 
