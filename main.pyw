@@ -128,7 +128,7 @@ class Ui(QMainWindow):
     def __init__(self, *args, **kwargs):
         super(Ui, self).__init__(*args, **kwargs)
 
-        uic.loadUi('main_ui.ui', self)
+        uic.loadUi('gui.ui', self)
         self.setWindowTitle("MickroK Temperature Reader")
 
         # ==========================================================
