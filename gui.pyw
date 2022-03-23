@@ -331,7 +331,7 @@ class Ui(QMainWindow):
 
     def save_workbook(self):
         filename = self.workbook_create_date.strftime("%Y-%m-%d-%f")
-        self.workbook.save(filename="{}.xlsx".format(filename))
+        self.workbook.save(filename="C:\\Users\\PARAS2\\Documents\\microk\\{}.xlsx".format(filename))
         self.workbook.close()
 
     # ==========================================================
