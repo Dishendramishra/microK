@@ -114,10 +114,10 @@ class serialThread(QThread):
                             self.ser_write.write(val.encode())
                             self.ser_write.write(b"\n")
                             self.ser_write.flush()
+                            x_ += 1
 
                 except Exception as e:
                             print(e)
-                x_ += 1
 
 class Ui(QMainWindow):
     
@@ -238,7 +238,8 @@ class Ui(QMainWindow):
         x = [item['x'] for item in self.data]
         y = [item['y'] for item in self.data]
         self.curve.setData(x,y)
-        self.sheet['A'+str(data_point[0])].value = val_x
+        # self.sheet['A'+str(data_point[0])].value = val_x
+        self.sheet['A'+str(data_point[0])].value = datetime.now().strftime("%Y-%m-%d:%H:%M:%S")
         self.sheet['B'+str(data_point[0])].value = val_y
 
     def start(self):
