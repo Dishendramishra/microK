@@ -344,7 +344,7 @@
        </layout>
       </item>
       <item>
-       <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,0,1">
+       <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,0,0,1">
         <property name="leftMargin">
          <number>5</number>
         </property>
@@ -363,13 +363,6 @@
         <property name="verticalSpacing">
          <number>20</number>
         </property>
-        <item row="10" column="1">
-         <widget class="QCheckBox" name="chbx_write10">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
         <item row="8" column="1">
          <widget class="QCheckBox" name="chbx_write8">
           <property name="text">
@@ -377,26 +370,14 @@
           </property>
          </widget>
         </item>
-        <item row="5" column="2">
-         <widget class="QLabel" name="lbl_ch5">
-          <property name="font">
-           <font>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="layoutDirection">
-           <enum>Qt::LeftToRight</enum>
-          </property>
+        <item row="10" column="1">
+         <widget class="QCheckBox" name="chbx_write10">
           <property name="text">
-           <string>CH 11</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           <string/>
           </property>
          </widget>
         </item>
-        <item row="10" column="2">
+        <item row="10" column="3">
          <widget class="QLabel" name="lbl_ch10">
           <property name="font">
            <font>
@@ -411,11 +392,59 @@
            <string>CH 16</string>
           </property>
           <property name="alignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
-        <item row="9" column="2">
+        <item row="5" column="3">
+         <widget class="QLabel" name="lbl_ch5">
+          <property name="font">
+           <font>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="text">
+           <string>CH 11</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="4">
+         <widget class="QLabel" name="lbl_ch1_val">
+          <property name="text">
+           <string>-</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="3">
+         <widget class="QLabel" name="lbl_ch8">
+          <property name="font">
+           <font>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="text">
+           <string>CH 14</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="3">
          <widget class="QLabel" name="lbl_ch9">
           <property name="font">
            <font>
@@ -430,11 +459,11 @@
            <string>CH 15</string>
           </property>
           <property name="alignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
-        <item row="4" column="2">
+        <item row="4" column="3">
          <widget class="QLabel" name="lbl_ch4">
           <property name="font">
            <font>
@@ -449,30 +478,11 @@
            <string>CH 10</string>
           </property>
           <property name="alignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
-        <item row="8" column="2">
-         <widget class="QLabel" name="lbl_ch8">
-          <property name="font">
-           <font>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="layoutDirection">
-           <enum>Qt::LeftToRight</enum>
-          </property>
-          <property name="text">
-           <string>CH14</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="2">
+        <item row="3" column="3">
          <widget class="QLabel" name="lbl_ch3">
           <property name="font">
            <font>
@@ -487,31 +497,11 @@
            <string>CH 3</string>
           </property>
           <property name="alignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="3">
-         <widget class="QLabel" name="lbl_ch1_val">
-          <property name="text">
-           <string>-</string>
-          </property>
-          <property name="alignment">
            <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
-        <item row="4" column="3">
-         <widget class="QLabel" name="lbl_ch4_val">
-          <property name="text">
-           <string>-</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="2">
+        <item row="6" column="3">
          <widget class="QLabel" name="lbl_ch6">
           <property name="font">
            <font>
@@ -523,14 +513,14 @@
            <enum>Qt::LeftToRight</enum>
           </property>
           <property name="text">
-           <string>CH12</string>
+           <string>CH 12</string>
           </property>
           <property name="alignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
-        <item row="3" column="3">
+        <item row="3" column="4">
          <widget class="QLabel" name="lbl_ch3_val">
           <property name="text">
            <string>-</string>
@@ -540,7 +530,17 @@
           </property>
          </widget>
         </item>
-        <item row="6" column="3">
+        <item row="4" column="4">
+         <widget class="QLabel" name="lbl_ch4_val">
+          <property name="text">
+           <string>-</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="4">
          <widget class="QLabel" name="lbl_ch6_val">
           <property name="text">
            <string>-</string>
@@ -550,7 +550,27 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="2">
+        <item row="5" column="4">
+         <widget class="QLabel" name="lbl_ch5_val">
+          <property name="text">
+           <string>-</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="4">
+         <widget class="QLabel" name="lbl_ch10_val">
+          <property name="text">
+           <string>-</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3">
          <widget class="QLabel" name="lbl_ch1">
           <property name="minimumSize">
            <size>
@@ -571,21 +591,11 @@
            <string>CH 1</string>
           </property>
           <property name="alignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="3">
-         <widget class="QLabel" name="lbl_ch5_val">
-          <property name="text">
-           <string>-</string>
-          </property>
-          <property name="alignment">
            <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
-        <item row="2" column="2">
+        <item row="2" column="3">
          <widget class="QLabel" name="lbl_ch2">
           <property name="font">
            <font>
@@ -600,31 +610,11 @@
            <string>CH 2</string>
           </property>
           <property name="alignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="10" column="3">
-         <widget class="QLabel" name="lbl_ch10_val">
-          <property name="text">
-           <string>-</string>
-          </property>
-          <property name="alignment">
            <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
-        <item row="9" column="3">
-         <widget class="QLabel" name="lbl_ch9_val">
-          <property name="text">
-           <string>-</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="2">
+        <item row="7" column="3">
          <widget class="QLabel" name="lbl_ch7">
           <property name="font">
            <font>
@@ -639,23 +629,6 @@
            <string>CH 13</string>
           </property>
           <property name="alignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QCheckBox" name="chbx_read1">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="3">
-         <widget class="QLabel" name="lbl_ch7_val">
-          <property name="text">
-           <string>-</string>
-          </property>
-          <property name="alignment">
            <set>Qt::AlignCenter</set>
           </property>
          </widget>
@@ -667,8 +640,15 @@
           </property>
          </widget>
         </item>
-        <item row="8" column="3">
-         <widget class="QLabel" name="lbl_ch8_val">
+        <item row="1" column="0">
+         <widget class="QCheckBox" name="chbx_read1">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="4">
+         <widget class="QLabel" name="lbl_ch9_val">
           <property name="text">
            <string>-</string>
           </property>
@@ -677,8 +657,35 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="3">
+        <item row="7" column="4">
+         <widget class="QLabel" name="lbl_ch7_val">
+          <property name="text">
+           <string>-</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0">
+         <widget class="QCheckBox" name="chbx_read6">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="4">
          <widget class="QLabel" name="lbl_ch2_val">
+          <property name="text">
+           <string>-</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="4">
+         <widget class="QLabel" name="lbl_ch8_val">
           <property name="text">
            <string>-</string>
           </property>
@@ -701,8 +708,15 @@
           </property>
          </widget>
         </item>
-        <item row="6" column="0">
-         <widget class="QCheckBox" name="chbx_read6">
+        <item row="9" column="1">
+         <widget class="QCheckBox" name="chbx_write9">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="0">
+         <widget class="QCheckBox" name="chbx_read10">
           <property name="text">
            <string/>
           </property>
@@ -722,20 +736,6 @@
           </property>
          </widget>
         </item>
-        <item row="9" column="0">
-         <widget class="QCheckBox" name="chbx_read9">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="10" column="0">
-         <widget class="QCheckBox" name="chbx_read10">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
         <item row="8" column="0">
          <widget class="QCheckBox" name="chbx_read8">
           <property name="text">
@@ -743,22 +743,8 @@
           </property>
          </widget>
         </item>
-        <item row="9" column="1">
-         <widget class="QCheckBox" name="chbx_write9">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QCheckBox" name="chbx_write1">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QCheckBox" name="chbx_write2">
+        <item row="9" column="0">
+         <widget class="QCheckBox" name="chbx_read9">
           <property name="text">
            <string/>
           </property>
@@ -771,13 +757,6 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="1">
-         <widget class="QCheckBox" name="chbx_write3">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
         <item row="5" column="1">
          <widget class="QCheckBox" name="chbx_write5">
           <property name="text">
@@ -785,10 +764,51 @@
           </property>
          </widget>
         </item>
+        <item row="2" column="1">
+         <widget class="QCheckBox" name="chbx_write2">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QCheckBox" name="chbx_write1">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QCheckBox" name="chbx_write3">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Channel</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
         <item row="4" column="1">
          <widget class="QCheckBox" name="chbx_write4">
           <property name="text">
            <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Serial&lt;/p&gt;&lt;p&gt;Write&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
@@ -804,29 +824,98 @@
           <property name="text">
            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Serial&lt;/p&gt;&lt;p&gt;Read&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Serial&lt;/p&gt;&lt;p&gt;Write&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
-        <item row="0" column="2">
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>Channel</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="3">
+        <item row="0" column="4">
          <widget class="QLabel" name="label_4">
           <property name="text">
            <string>Value</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Log&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QCheckBox" name="chbx_log1">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QCheckBox" name="chbx_log">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="2">
+         <widget class="QCheckBox" name="chbx_log3">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="2">
+         <widget class="QCheckBox" name="chbx_log4">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="2">
+         <widget class="QCheckBox" name="chbx_log5">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="2">
+         <widget class="QCheckBox" name="chbx_log6">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="2">
+         <widget class="QCheckBox" name="chbx_log7">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="2">
+         <widget class="QCheckBox" name="chbx_log_2">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="2">
+         <widget class="QCheckBox" name="chbx_log_3">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="2">
+         <widget class="QCheckBox" name="chbx_log10">
+          <property name="text">
+           <string/>
           </property>
          </widget>
         </item>
