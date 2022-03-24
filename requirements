@@ -4,3 +4,4 @@ pyqtgraph==0.12.3
 qt_material==2.8.13
 pyserial==3.5
 openpyxl==3.0.9
+winshell
