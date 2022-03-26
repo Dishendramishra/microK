@@ -136,7 +136,7 @@ class Ui(QMainWindow):
         #                       Graphing Window 
         # ==========================================================
         self.win = pg.GraphicsWindow()
-        self.plot = self.win.addPlot(title='', labels={'bottom': 'time','left': "temperature"})
+        self.plot = self.win.addPlot(title='', labels={'bottom': 'Time','left': "Temperature °C"})
         self.curve = self.plot.plot()
         self.data = deque(maxlen=20)
         # ==========================================================
