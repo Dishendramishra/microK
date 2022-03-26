@@ -15,7 +15,8 @@ import sys
 from time import sleep
 from collections import deque
 from datetime import date, datetime
-
+from os.path import expanduser, join, isdir
+from os import getcwd, mkdir
 
 if sys.platform == "linux" or sys.platform == "linux2":
     pass
@@ -345,7 +346,11 @@ class Ui(QMainWindow):
 
     def save_workbook(self):
         filename = self.workbook_create_date.strftime("%Y-%m-%d-%f")
-        self.workbook.save(filename="C:\\Users\\PARAS2\\Documents\\microk\\{}.xlsx".format(filename))
+
+        microk_dir = join(expanduser("~"), "Documents", "microk")
+        if not isdir(microk_dir):
+            mkdir(microk_dir)
+        self.workbook.save(filename=join(microk_dir,filename+".xlsx"))
         self.workbook.close()
 
     # ==========================================================
