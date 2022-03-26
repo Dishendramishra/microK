@@ -275,8 +275,6 @@ class Ui(QMainWindow):
         self.serial_thread.write_channels = self.channels_to_write
         self.serial_thread.log_channels   = self.channels_to_log
 
-        self.configure_workbook()
-
     def update_channel_val(self, data_list):
         self.val_lbls[data_list[0]].setText(data_list[1])
 
@@ -299,10 +297,19 @@ class Ui(QMainWindow):
         self.sheet = self.workbook.active
         self.col_in_sheet = 1
 
-    def configure_workbook(self):
+        self.workbook_filename = self.workbook_create_date.strftime("%Y-%m-%d-%f")
+
+        self.microk_dir = join(expanduser("~"), "Documents", "microk")
+        if not isdir(self.microk_dir):
+            mkdir(self.microk_dir)
+        self.workbook.save(filename=join(self.microk_dir, self.workbook_filename+".xlsx"))
+
+        self.channels_to_log = []
+        for key, value in self.log_chbx_grp.items():
+            if value.isChecked():
+                self.channels_to_log.append(key)
 
         current_row = 2
-
         if not self.channel_indices:
             self.channel_indices = {}
 
@@ -311,22 +318,24 @@ class Ui(QMainWindow):
             # before adding a channel in excel file we need to find 
             # the starting row number for newly added column, to
             # start saving data
-            if channel in self.channel_indices:
-                current_row = self.channel_indices[channel][2]
+            # if channel in self.channel_indices:
+            #     current_row = self.channel_indices[channel][2]
 
-            if channel not in self.channel_indices:
+            # if channel not in self.channel_indices:
                 #                               [ timestamp col, value col, row]
-                self.sheet.cell(row=1, column=self.col_in_sheet).value = f'{self.channel_names[channel]} Timestamp'
-                self.sheet.cell(row=1, column=self.col_in_sheet+1).value =f'{self.channel_names[channel]}'
+            self.sheet.cell(row=1, column=self.col_in_sheet).value = f'{self.channel_names[channel]} Timestamp'
+            self.sheet.cell(row=1, column=self.col_in_sheet+1).value =f'{self.channel_names[channel]}'
 
-                self.channel_indices[channel] = [self.col_in_sheet, self.col_in_sheet+1, current_row]
-                
-                self.col_in_sheet  += 2
+            self.channel_indices[channel] = [self.col_in_sheet, self.col_in_sheet+1, current_row]
+            
+            self.col_in_sheet  += 2
 
     def update_workbook(self, data_obj):
-        # Checking if new day starting, if new day start then 
-        # creating and configuring a new excel file.
-        if datetime.now().strftime("%d") > self.workbook_create_date.strftime("%d"):
+        # Check for next day 9:00 AM time if occured create
+        # a new file.
+
+        current_time = datetime.now()
+        if current_time.strftime("%d") > self.workbook_create_date.strftime("%d") and int(current_time.strftime("%H")) >= 9:
             self.save_workbook()
             self.create_workbook()
 
@@ -343,14 +352,15 @@ class Ui(QMainWindow):
 
         # increading row value for writing next time
         self.channel_indices[channel][2] += 1
+        self.workbook.save(filename=join(self.microk_dir, self.workbook_filename+".xlsx"))
 
     def save_workbook(self):
-        filename = self.workbook_create_date.strftime("%Y-%m-%d-%f")
+        # filename = self.workbook_create_date.strftime("%Y-%m-%d-%f")
 
-        microk_dir = join(expanduser("~"), "Documents", "microk")
-        if not isdir(microk_dir):
-            mkdir(microk_dir)
-        self.workbook.save(filename=join(microk_dir,filename+".xlsx"))
+        # self.microk_dir = join(expanduser("~"), "Documents", "microk")
+        # if not isdir(self.microk_dir):
+        #     mkdir(self.microk_dir)
+        # self.workbook.save(filename=join(self.microk_dir,filename+".xlsx"))
         self.workbook.close()
 
     # ==========================================================
